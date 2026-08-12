@@ -1,0 +1,13 @@
+*.pyc
+__pycache__
+.git
+.env
+.env.local
+.DS_Store
+.vscode
+.idea
+node_modules
+.next
+dist
+build
+coverage
