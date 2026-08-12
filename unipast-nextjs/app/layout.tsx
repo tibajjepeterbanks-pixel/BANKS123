@@ -1,12 +1,10 @@
-'use client';
-
 import type { Metadata } from 'next';
 import { Providers } from './providers';
 import { Navigation } from '@/components/layout/Navigation';
 import { Footer } from '@/components/layout/Footer';
 import './globals.css';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'UNIPAST - Uganda Universities Past Papers Portal',
   description: 'Access past papers from 20 leading Ugandan universities. Study with confidence using real exam papers.',
   keywords: 'past papers, Uganda, universities, exam preparation',
