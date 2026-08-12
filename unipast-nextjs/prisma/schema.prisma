@@ -1,0 +1,293 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Models
+model User {
+  id                    String    @id @default(cuid())
+  email                 String    @unique
+  name                  String?
+  phone                 String?
+  password              String?
+  profilePicture        String?
+  role                  Role      @default(STUDENT)
+  registrationNumber    String?   @unique
+  collegeName           String?
+  programme             String?
+  year                  Int?
+  
+  // Relations
+  sessions              Session[]
+  account               Account?
+  papers                PaperUpload[]
+  downloads             Download[]
+  payments              Payment[]
+  bookmarks             Bookmark[]
+  notifications         Notification[]
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  @unique
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Academic Structure
+model College {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  code        String    @unique
+  description String?   @db.Text
+  
+  schools     School[]
+  courses     Course[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model School {
+  id          String    @id @default(cuid())
+  name        String
+  code        String
+  collegeId   String
+  college     College   @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  
+  courses     Course[]
+  programmes  Programme[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@unique([collegeId, code])
+}
+
+model Programme {
+  id          String    @id @default(cuid())
+  name        String
+  code        String    @unique
+  schoolId    String
+  school      School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  
+  courses     Course[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Course {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  name        String
+  description String?   @db.Text
+  credits     Int?
+  
+  // Academic structure
+  collegeId   String
+  college     College   @relation(fields: [collegeId], references: [id], onDelete: Cascade)
+  
+  schoolId    String
+  school      School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  
+  programmeId String?
+  programme   Programme? @relation(fields: [programmeId], references: [id])
+  
+  year        Int       // 1, 2, 3, 4
+  semester    Int       // 1 or 2
+  
+  // Relations
+  papers      Paper[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@unique([code, year, semester])
+}
+
+// Papers
+model Paper {
+  id            String    @id @default(cuid())
+  courseId      String
+  course        Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  academicYear  String    // 2024/2025
+  fileName      String
+  fileSize      Int       // in bytes
+  pages         Int?
+  fileUrl       String    @db.Text
+  
+  uploadedBy    String
+  uploader      User      @relation("PaperUpload", fields: [uploadedBy], references: [id])
+  
+  downloads     Download[]
+  bookmarks     Bookmark[]
+  
+  views         Int       @default(0)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model PaperUpload {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  paperId       String?
+  fileName      String
+  fileSize      Int
+  status        UploadStatus @default(PENDING)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// Downloads & Access Control
+model Download {
+  id            String    @id @default(now())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  paperId       String
+  paper         Paper     @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  
+  courseCode    String
+  
+  paymentId     String?
+  payment       Payment?  @relation(fields: [paymentId], references: [id])
+  
+  ipAddress     String?
+  userAgent     String?   @db.Text
+  
+  createdAt     DateTime  @default(now())
+}
+
+// Payments
+model Payment {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  amount        Int       // UGX amount (200)
+  currency      String    @default("UGX")
+  
+  status        PaymentStatus @default(PENDING)
+  paymentMethod String?   // MTN, AIRTEL, etc.
+  referenceCode String?   @unique
+  
+  downloads     Download[]
+  
+  verifiedAt    DateTime?
+  verifiedBy    String?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+// Bookmarks
+model Bookmark {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  paperId       String
+  paper         Paper     @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime  @default(now())
+  
+  @@unique([userId, paperId])
+}
+
+// Notifications
+model Notification {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title         String
+  message       String    @db.Text
+  type          NotificationType
+  relatedId     String?   // paperId, courseId, etc.
+  
+  read          Boolean   @default(false)
+  readAt        DateTime?
+  
+  createdAt     DateTime  @default(now())
+}
+
+// Audit Log
+model AuditLog {
+  id            String    @id @default(cuid())
+  action        String
+  entity        String    // User, Paper, Payment, etc.
+  entityId      String
+  userId        String?
+  oldValues     String?   @db.Text
+  newValues     String?   @db.Text
+  ipAddress     String?
+  userAgent     String?   @db.Text
+  
+  createdAt     DateTime  @default(now())
+}
+
+// Enums
+enum Role {
+  STUDENT
+  LECTURER
+  ADMIN
+  SUPERADMIN
+}
+
+enum PaymentStatus {
+  PENDING
+  VERIFIED
+  FAILED
+  CANCELLED
+}
+
+enum UploadStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum NotificationType {
+  PAYMENT
+  UPLOAD
+  DOWNLOAD
+  SYSTEM
+  ANNOUNCEMENT
+}

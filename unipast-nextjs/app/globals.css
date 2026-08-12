@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  @apply box-border;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100;
+  @apply font-sans transition-colors duration-200;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-100 dark:bg-slate-900;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-400 dark:bg-slate-600 rounded hover:bg-slate-500;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Custom Classes */
+.text-gradient {
+  @apply bg-gradient-to-r from-makerere-maroon to-makerere-gold bg-clip-text text-transparent;
+}
+
+.card-hover {
+  @apply transition-all duration-300 hover:shadow-hover hover:scale-105;
+}
+
+.btn-primary {
+  @apply px-4 py-2 rounded-lg bg-gradient-to-r from-makerere-maroon to-makerere-gold text-white font-semibold transition-all duration-300 hover:shadow-lg active:scale-95;
+}
+
+.btn-secondary {
+  @apply px-4 py-2 rounded-lg border-2 border-makerere-maroon text-makerere-maroon font-semibold transition-all duration-300 hover:bg-makerere-maroon hover:text-white active:scale-95;
+}
+
+.input-field {
+  @apply w-full px-4 py-2 rounded-lg border-2 border-slate-300 dark:border-slate-700 focus:border-makerere-gold focus:ring-0 transition-colors;
+}
+
+.page-container {
+  @apply min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900;
+}

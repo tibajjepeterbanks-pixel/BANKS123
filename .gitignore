@@ -7,4 +7,19 @@ __pycache__/
 venv/
 .env.local
 .DS_Store
-unipast-nextjs/
+
+# Next.js specific ignores (but include the directory itself)
+unipast-nextjs/node_modules/
+unipast-nextjs/.next/
+unipast-nextjs/out/
+unipast-nextjs/build/
+unipast-nextjs/dist/
+unipast-nextjs/.env
+unipast-nextjs/.env.local
+unipast-nextjs/.env.*.local
+unipast-nextjs/.git/
+unipast-nextjs/.vscode/
+unipast-nextjs/.idea/
+unipast-nextjs/coverage/
+unipast-nextjs/.pnp
+unipast-nextjs/.pnp.js
