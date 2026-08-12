@@ -4,11 +4,12 @@ services:
     root: unipast-nextjs
     runtime: node
     plan: free
-    buildCommand: npm install && npx prisma generate && npm run build
-    startCommand: npm run start
+    buildCommand: npm ci && npx prisma generate && npm run build
+    startCommand: npm start
+    autoDeploy: true
     envVars:
       - key: NODE_VERSION
-        value: 18.17.0
+        value: 18
       - key: NODE_ENV
         value: production
       - key: NEXTAUTH_SECRET
