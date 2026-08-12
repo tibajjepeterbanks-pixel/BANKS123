@@ -1,0 +1,10 @@
+portal.db
+uploaded_papers/
+__pycache__/
+*.pyc
+.env
+*.sqlite3
+venv/
+.env.local
+.DS_Store
+unipast-nextjs/
